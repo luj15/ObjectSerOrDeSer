@@ -52,7 +52,7 @@ public class BitMapSerOrDeser {
     public static RoaringBitmap getBitMapObject(String str) throws IOException {
 
         RoaringBitmap bitmap = new RoaringBitmap();
-        byte[] bytes = StringUtil.toByteArray(str);
+        byte[] bytes = toByteArray(str);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
         DataInputStream in = new DataInputStream(byteArrayInputStream);
         bitmap.deserialize(in);
@@ -61,5 +61,26 @@ public class BitMapSerOrDeser {
         return bitmap;
     }
 
+    /**
+     * 将字符串转换成byte数组
+     *
+     * @param hexString 字符串。
+     * @return byte数组
+     */
+    public static byte[] toByteArray(String hexString) {
+        if (hexString.isEmpty())
+            throw new IllegalArgumentException("this hexString must not be empty");
+
+        hexString = hexString.toLowerCase();
+        final byte[] byteArray = new byte[hexString.length() / 2];
+        int k = 0;
+        for (int i = 0; i < byteArray.length; i++) {//因为是16进制，最多只会占用4位，转换成字节需要两个16进制的字符，高位在先
+            byte high = (byte) (Character.digit(hexString.charAt(k), 16) & 0xff);
+            byte low = (byte) (Character.digit(hexString.charAt(k + 1), 16) & 0xff);
+            byteArray[i] = (byte) (high << 4 | low);
+            k += 2;
+        }
+        return byteArray;
+    }
 
 }
